@@ -1,0 +1,19 @@
+uniform shader image;
+uniform float2 center; // Distortion center
+uniform float radius; // Distortion radius
+uniform float strength; // Distortion strength (e.g. 1.5 for enlargement)
+
+vec4 main(vec2 pos) {
+    vec2 dir = pos - center;
+    float dist = length(dir);
+    
+    if (dist < radius) {
+        // Simple fish-eye / sphere warp logic
+        float normDist = dist / radius;
+        float warp = pow(normDist, 1.0 / strength); 
+        vec2 warpedPos = center + dir * (warp / normDist);
+        return image.eval(warpedPos);
+    }
+    
+    return image.eval(pos);
+}

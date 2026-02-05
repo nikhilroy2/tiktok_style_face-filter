@@ -1,0 +1,21 @@
+uniform shader image;
+uniform float2 resolution;
+uniform float smoothingAmount; // 0 to 1
+
+vec4 main(vec2 pos) {
+    vec4 color = image.eval(pos);
+    
+    // Simple Box Blur / Smoothing logic for skin
+    // In a real bilateral filter, we would compare color distances
+    // For 60FPS, we use a lightweight approach
+    
+    vec2 offset = vec2(1.0 / resolution.x, 1.0 / resolution.y);
+    vec4 sum = color * 0.4;
+    sum += image.eval(pos + vec2(offset.x, 0)) * 0.15;
+    sum += image.eval(pos - vec2(offset.x, 0)) * 0.15;
+    sum += image.eval(pos + vec2(0, offset.y)) * 0.15;
+    sum += image.eval(pos - vec2(0, offset.y)) * 0.15;
+    
+    // Interpolate between original and smoothed based on smoothingAmount
+    return mix(color, sum, smoothingAmount);
+}
